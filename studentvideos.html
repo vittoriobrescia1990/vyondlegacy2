@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<link rel="icon" href="../../favicon.ico" type="image/png">
+	<title>Wrapper Offline 1.2.3</title>
+	<meta name="description" content="Wrapper: Online's Video List">
+	<link rel="stylesheet" type="text/css" href="css/modern-normalize.css">
+	<link rel="stylesheet" type="text/css" href="css/pagelist.css">
+	<link rel="stylesheet" type="text/css" href="css/list.css">
+</head>
+<body>
+
+<header>
+	<h1 style="margin:0"><img id="logo" src="list_logo.png" alt="Wrapper: Offline"/></h1>
+	<nav id="headbuttons">
+		<a class="button_small" onclick="document.getElementById('file').click()">UPLOAD A VIDEO XML</a>
+		<div class="dropdown_contain button_small">
+		<div class="dropdown_button">YOUR ACCOUNT</div>
+			<nav class="dropdown_menu">
+		        <li><a href="studentvideos">Dashboard</a>
+                        <li><a href="videoslist">Your Videos</a>
+                        <li><a href="account">Account Settings</a>
+                        <li><a href="profile">Your Profile</a></li>
+                        <li class="divider"></li>
+                        <li><a class="logout-link" href="index">Logout</a></li>
+			</nav>
+                            </div>
+		<div class="dropdown_contain button_small">
+			<div class="dropdown_button">EXPLORE</div>
+				<nav class="dropdown_menu">
+			<a href="students">Students</a>
+                        <a href="teachers">Teachers</a>
+                        <a href="videos">Videos</a>
+                        <li><a href="https://web.archive.org/web/20181004174617/https://blog.goanimate4schools.com/">Educator Experiences</a>
+                        <li><a href="faq">FAQ</a>
+					
+				</nav>
+		</div>
+                            <a href="listdark2.html" class="button_big">DARK MODE</a>
+		<a href="https://www.youtube.com/watch?v=Igf8BvO0Mbs" class="button_big">DEMO</a>						
+		<a href="/go_full?&isWide=0" class="button_big">MAKE A WIDE</a>
+		<a href="/go_full" class="button_big">MAKE A VIDEO</a>
+	</nav>
+</header>
+
+<main>
+	<table>
+		<thead>
+			<tr>
+				
+				<iframe src="https://goanimate-wrapper5.herokuapp.com" style="border:0px #ffffff none;" name="myiFrame" scrolling="no" frameborder="1" marginheight="720px" marginwidth="1280px" height="400px" width="600px" allowfullscreen></iframe>
+				<td>Video Title</td>
+				<td>Last Modified</td>
+				<h2>Your Videos</h2>
+			</tr>
+		</thead>
+		<tbody></tbody>
+		<tfoot>
+			<tr>
+				<td colspan="127"><a id="load_more" href="javascript:;">LOAD MORE...</a></td>
+			</tr>
+		</tfoot>
+	</table>
+</main>
+
+<footer>
+	<nav id="foot-left">
+		<a href="http://discord.gg/b7YSRkg">Wrapper Offline Discord</a>
+		<a href="http://discord.gg/goanimate">Wrapper Central Discord</a>
+	</nav>
+
+	<nav id="foot-right">
+		<a href="https://discord.gg/kvwnZThM">Wrapper Online Discord</a>
+		<a href="https://wrapper-online-remastered1.herokuapp.com">Wrapper Online Remastered</a>
+	</nav>
+</footer>
+
+
+<form enctype='multipart/form-data' action='/upload_movie' method='post'>
+	<input id='file' type="file" onchange="this.form.submit()" name='import' />
+</form>
+
+</body>
+
+<script>
+	const closeReq = new XMLHttpRequest();
+	closeReq.open('GET', '/events/close');
+	closeReq.send();
+
+	var json;
+	var tbody = document.getElementsByTagName('tbody')[0];
+	var loadMore = document.getElementById('load_more');
+	const listReq = new XMLHttpRequest();
+	listReq.open('GET', '/movieList');
+	listReq.send();
+
+	var C = 0;
+	function loadRows() {
+		let c = C; C += 69;
+		for (; c < C; c++) {
+			if (c > json.length - 1) {
+				loadMore.remove();
+				break;
+			}
+
+			const tbl = json[c];
+			const date = tbl.date.substr(0, 10) + ' ' + tbl.date.substr(11);
+			tbody.insertAdjacentHTML('beforeend',
+				'<tr><td><img src="/movie_thumbs/' + tbl.id + '"></td><td><div>' + tbl.title + '</div><div>' + tbl.durationString + '</div></div></td><td><span>' + date.match(/./g).join('</span><span>') + '</span></td><td><a href="javascript:;" onclick="popup(\'' + tbl.id + '\')"></a><a href="/go_full?movieId=' + tbl.id + '"></a><a href="/movies/' + tbl.id + '.xml" download="' + tbl.title + '"></a></td></tr>');
+		}
+	}
+
+	loadMore.onclick = loadRows;
+	listReq.onreadystatechange = function (e) {
+		if (listReq.readyState != 4) return;
+		json = JSON.parse(listReq.responseText);
+		loadRows();
+	}
+
+	function popup(id) {
+		window.open('/player?movieId=' + id, 'MsgWindow', 'width=1280,height=720,left=' + (screen.width / 2 - 640) + ',top=' + (screen.height / 2 - 360));
+	}
+</script>
+
+</html>
